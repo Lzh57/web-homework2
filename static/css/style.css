@@ -1,0 +1,21 @@
+/* 設定中文字體 */
+:root {
+    --pico-font-family: "Microsoft JhengHei", system-ui, sans-serif;
+}
+
+/* 讓主要內容區塊垂直置中 */
+main.container {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    min-height: 70vh;
+}
+
+/* 讓 Article 標籤更有容器感 */
+article {
+    border: 1px solid var(--pico-muted-border-color);
+}
+
+/* 修正按鈕間距 */
+.grid a {
+    margin-bottom: 1rem;
+}

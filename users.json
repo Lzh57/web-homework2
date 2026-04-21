@@ -1,0 +1,25 @@
+{
+    "users": [
+        {
+            "username": "admin",
+            "email": "admin@example.com",
+            "password": "admin123",
+            "phone": "0912345678",
+            "birthdate": "1990-01-01"
+        },
+        {
+            "username": "wee",
+            "email": "seviro@gmail.com",
+            "password": "12345678",
+            "phone": "0926589897",
+            "birthdate": "2026-04-20"
+        },
+        {
+            "username": "retrnhy",
+            "email": "rgest@gmail.com",
+            "password": "12345678",
+            "phone": "0902303389",
+            "birthdate": "2026-04-20"
+        }
+    ]
+}

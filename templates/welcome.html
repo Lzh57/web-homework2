@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}歡迎 {{ user.username }}{% endblock %}
+
+{% block content %}
+<article>
+    <hgroup>
+        <h2>登入成功！</h2>
+        <p>歡迎回來，<strong>{{ user.username }}</strong></p>
+    </hgroup>
+
+    <hr>
+
+    <h5>您的個人基本資料：</h5>
+    <ul>
+        <li><strong>帳號：</strong> {{ user.username }}</li>
+        <li><strong>電子信箱：</strong> {{ user.email }}</li>
+        <li><strong>連絡電話：</strong> {{ user.phone | mask_phone }}</li>
+        <li><strong>出生日期：</strong> {{ user.birthdate | format_tw_date }}</li>
+    </ul>
+
+    <div class="grid">
+        <a href="{{ url_for('users_list_route') }}" role="button" class="outline">
+            查看所有會員清單
+        </a>
+        <a href="{{ url_for('index') }}" role="button" class="secondary">
+            回到首頁
+        </a>
+    </div>
+</article>
+{% endblock %}

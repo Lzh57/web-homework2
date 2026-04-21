@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}首頁 - 簡易會員系統{% endblock %}
+
+{% block content %}
+<article style="text-align: center; padding: 3rem 1rem;">
+    <hgroup>
+        <h1>簡易會員系統</h1>
+        <p>本系統採用 JSON 檔案儲存資料，模擬無狀態 Web 請求流程。</p>
+    </hgroup>
+
+    <div class="grid" style="max-width: 500px; margin: 2rem auto 0;">
+        <a href="{{ url_for('register_route') }}" role="button" class="contrast">
+            📄 立即註冊
+        </a>
+        <a href="{{ url_for('login_route') }}" role="button" class="secondary">
+            🔑 會員登入
+        </a>
+    </div>
+</article>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}會員清單{% endblock %}
+
+{% block content %}
+<h2>所有會員清單</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>帳號</th>
+            <th>Email</th>
+            <th>電話 (遮罩)</th>
+            <th>生日 (民國)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phone | mask_phone }}</td>
+            <td>{{ user.birthdate | format_tw_date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

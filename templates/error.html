@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}發生錯誤 - 簡易會員系統{% endblock %}
+
+{% block content %}
+<article>
+    <hgroup>
+        <h2 style="color: #e74c3c;">⚠️ 操作失敗</h2>
+        <p>很抱歉，系統在處理您的請求時遇到了問題。</p>
+    </hgroup>
+
+    <div style="background-color: rgba(231, 76, 60, 0.1); border-left: 4px solid #e74c3c; padding: 1rem; margin-bottom: 2rem;">
+        <strong>錯誤原因：</strong> {{ message }}
+    </div>
+
+    <div class="grid">
+        <a href="javascript:history.back()" role="button" class="contrast">
+            ⬅️ 返回上一頁
+        </a>
+        <a href="{{ url_for('index') }}" role="button" class="secondary">
+            🏠 回到首頁
+        </a>
+    </div>
+</article>
+
+<footer>
+    <p><small>若持續發生問題，請聯絡系統管理員。</small></p>
+</footer>
+{% endblock %}
