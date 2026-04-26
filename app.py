@@ -1,8 +1,9 @@
 import os
 import json
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
+app.secret_key = 'any_secret_string'
 
 # --- 1. 檔案路徑定義 ---
 USER_DATA_FILE = 'users.json'
@@ -165,7 +166,6 @@ def register_route():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_route():
-    """登入頁面：GET 顯示表單，POST 驗證帳密"""
     if request.method == 'POST':
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
@@ -173,27 +173,110 @@ def login_route():
         result = verify_login(email, password, data["users"])
 
         if result["success"]:
-            username = result["data"]["username"]
-            return redirect(url_for('welcome_route', username=username))
+            # --- 修改部分：存入 Session ---
+            user_data = result["data"]
+            session['username'] = user_data['username']
+            session['is_admin'] = (user_data['username'] == 'admin')
+            # 導向公告頁
+            return redirect(url_for('announcement')) 
         else:
             return redirect(url_for('error_route', message=result["error"]))
 
     return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    session.clear()  # 清除所有 session 資料
+    return redirect(url_for('index'))
 
-@app.route('/welcome/<username>')
-def welcome_route(username: str):
-    """歡迎頁，根據 username 顯示會員資料"""
+@app.route('/announcement')
+@app.route('/announcement')
+def announcement():
+    if 'username' not in session:
+        return redirect(url_for('error_route', message="請先登入"))
+    
+    # --- 新增這兩行：讀取目前登入者的資料 ---
+    data = read_users(USER_DATA_FILE)
+    user = next((u for u in data["users"] if u["username"] == session['username']), None)
+    
+    # --- 修改這行：把 user 變數傳給 HTML ---
+    return render_template('announcement.html', user=user)
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'username' not in session:
+        return redirect(url_for('error_route', message="請先登入"))
+
+    data = read_users(USER_DATA_FILE)
+    # 找目前登入的這個人
+    user = next((u for u in data["users"] if u["username"] == session['username']), None)
+    
+    if request.method == 'POST':
+        new_email = request.form.get("email", "").strip()
+        new_phone = request.form.get("phone", "").strip()
+        new_birthdate = request.form.get("birthdate", "").strip()
+        new_password = request.form.get("password", "").strip()
+
+        # Email 重複檢查 (排除自己)
+        for u in data["users"]:
+            if u["email"] == new_email and u["username"] != session['username']:
+                return redirect(url_for('error_route', message="Email 已被其他會員使用"))
+
+        # 更新資料
+        user['email'] = new_email
+        user['phone'] = new_phone
+        user['birthdate'] = new_birthdate
+        if new_password: # 有填才改密碼
+            user['password'] = new_password
+        
+        save_users(USER_DATA_FILE, data)
+        return redirect(url_for('profile'))
+
+    return render_template('profile.html', user=user)
+
+
+@app.route('/users/<username>/edit', methods=['GET', 'POST'])
+def edit_user_route(username):
+    if not session.get('is_admin'):
+        return redirect(url_for('error_route', message="無權限訪問"))
+
     data = read_users(USER_DATA_FILE)
     user = next((u for u in data["users"] if u["username"] == username), None)
-    if user is None:
-        return redirect(url_for('error_route', message="找不到該會員"))
-    return render_template('welcome.html', user=user)
+
+    if request.method == 'POST':
+        user['phone'] = request.form.get("phone", "").strip()
+        user['birthdate'] = request.form.get("birthdate", "").strip()
+        new_pw = request.form.get("password", "").strip()
+        if new_pw:
+            user['password'] = new_pw
+        
+        save_users(USER_DATA_FILE, data)
+        return redirect(url_for('users_list_route'))
+
+    return render_template('edit_user.html', user=user)
+
+@app.route('/users/<username>/delete', methods=['POST']) # 必須是 POST
+def delete_user_route(username):
+    if not session.get('is_admin'):
+        return redirect(url_for('error_route', message="無權限訪問"))
+
+    # 不能刪除 admin 或 自己
+    if username == 'admin' or username == session.get('username'):
+        return redirect(url_for('error_route', message="不可刪除此管理員帳號"))
+
+    data = read_users(USER_DATA_FILE)
+    data["users"] = [u for u in data["users"] if u["username"] != username]
+    save_users(USER_DATA_FILE, data)
+    return redirect(url_for('users_list_route'))
 
 
 @app.route('/users')
 def users_list_route():
-    """會員清單頁，列出所有會員（不顯示密碼）"""
+    # 檢查是否為 admin
+    if not session.get('is_admin'):
+        return redirect(url_for('error_route', message="無權限訪問"))
+    
     data = read_users(USER_DATA_FILE)
     return render_template('users.html', users=data["users"])
 

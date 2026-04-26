@@ -1,26 +1,44 @@
 {% extends "base.html" %}
-{% block title %}會員清單{% endblock %}
+
+{% block title %}會員管理 - 會員系統{% endblock %}
 
 {% block content %}
-<h2>所有會員清單</h2>
-<table border="1">
-    <thead>
-        <tr>
-            <th>帳號</th>
-            <th>Email</th>
-            <th>電話 (遮罩)</th>
-            <th>生日 (民國)</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.phone | mask_phone }}</td>
-            <td>{{ user.birthdate | format_tw_date }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<article>
+    <header>
+        <h2>👥 會員管理清單</h2>
+    </header>
+
+    <table class="striped">
+        <thead>
+            <tr>
+                <th>帳號</th>
+                <th>Email</th>
+                <th>電話</th>
+                <th>生日</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phone | mask_phone }}</td>
+                <td>{{ user.birthdate | format_tw_date }}</td>
+                <td>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="{{ url_for('edit_user_route', username=user.username) }}" role="button" class="outline">編輯</a>
+
+                        {% if user.username != 'admin' and user.username != session.get('username') %}
+                        <form action="{{ url_for('delete_user_route', username=user.username) }}" method="POST" onsubmit="return confirm('確定要刪除此帳號嗎？');" style="margin: 0;">
+                            <button type="submit" class="pico-background-red" style="background-color: #d81b60; border: none;">刪除</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</article>
 {% endblock %}

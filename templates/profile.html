@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}個人資料 - 會員系統{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h2>👤 個人資料管理</h2>
+        <p>您可以在此修改您的基本資料</p>
+    </header>
+
+    <form action="{{ url_for('profile') }}" method="POST">
+        <label for="username">帳號 (不可修改)</label>
+        <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        <small>請輸入包含 @ 與 . 的有效格式</small>
+
+        <div class="grid">
+            <label for="phone">
+                電話
+                <input type="tel" id="phone" name="phone" value="{{ user.phone }}" placeholder="0912345678">
+            </label>
+
+            <label for="birthdate">
+                出生日期
+                <input type="date" id="birthdate" name="birthdate" value="{{ user.birthdate }}" required>
+            </label>
+        </div>
+
+        <label for="password">新密碼 (若不修改請留空)</label>
+        <input type="password" id="password" name="password" placeholder="請輸入 6-16 位新密碼">
+        <small>密碼長度需介於 6 至 16 字元</small>
+
+        <footer style="margin-top: 2rem;">
+            <button type="submit">更新資料</button>
+            <a href="{{ url_for('announcement') }}" class="secondary outline" role="button">回公告頁</a>
+        </footer>
+    </form>
+</article>
+{% endblock %}

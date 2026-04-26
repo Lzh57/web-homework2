@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}系統公告 - 會員系統{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h2>📢 系統公告</h2>
+    </header>
+
+    <section>
+        <p><strong>【系統公告】</strong><br>
+        歡迎使用簡易會員系統！</p>
+        
+        <p>使用須知：<br>
+        1. 請妥善保管您的帳號密碼<br>
+        2. 個人資料請如實填寫<br>
+        3. 管理員擁有最高權限，請謹慎操作</p>
+        
+        <p><small>如有問題，請聯繫系統管理員。</small></p>
+    </section>
+
+    <footer style="display: flex; gap: 10px;">
+        <a href="{{ url_for('profile') }}" role="button">個人資料</a>
+
+        {% if session.get('is_admin') %}
+            <a href="{{ url_for('users_list_route') }}" role="button" class="contrast">會員管理</a>
+        {% endif %}
+
+        <a href="{{ url_for('logout') }}" role="button" class="outline">登出</a>
+    </footer>
+</article>
+{% endblock %}

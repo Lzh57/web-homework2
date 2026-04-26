@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}編輯會員 - 會員系統{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h2>🛠️ 編輯會員資料</h2>
+        <p>目前正在編輯：<strong>{{ user.username }}</strong></p>
+    </header>
+
+    <form action="{{ url_for('edit_user_route', username=user.username) }}" method="POST">
+        <div class="grid">
+            <label for="username">
+                帳號 (唯讀)
+                <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
+            </label>
+
+            <label for="email">
+                Email (唯讀)
+                <input type="email" id="email" name="email" value="{{ user.email }}" readonly>
+            </label>
+        </div>
+
+        <div class="grid">
+            <label for="phone">
+                電話
+                <input type="tel" id="phone" name="phone" value="{{ user.phone }}" placeholder="0912345678">
+            </label>
+
+            <label for="birthdate">
+                出生日期
+                <input type="date" id="birthdate" name="birthdate" value="{{ user.birthdate }}">
+            </label>
+        </div>
+
+        <label for="password">重設密碼 (若不修改請留空)</label>
+        <input type="password" id="password" name="password" placeholder="請輸入新密碼">
+        <small>管理員可以手動幫使用者重設密碼</small>
+
+        <footer style="margin-top: 2rem;">
+            <button type="submit">儲存修改</button>
+            <a href="{{ url_for('users_list_route') }}" class="secondary outline" role="button">取消並回會員管理</a>
+        </footer>
+    </form>
+</article>
+{% endblock %}
