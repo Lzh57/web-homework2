@@ -190,7 +190,6 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/announcement')
-@app.route('/announcement')
 def announcement():
     if 'username' not in session:
         return redirect(url_for('error_route', message="請先登入"))
@@ -209,7 +208,6 @@ def profile():
         return redirect(url_for('error_route', message="請先登入"))
 
     data = read_users(USER_DATA_FILE)
-    # 找目前登入的這個人
     user = next((u for u in data["users"] if u["username"] == session['username']), None)
     
     if request.method == 'POST':
@@ -223,11 +221,19 @@ def profile():
             if u["email"] == new_email and u["username"] != session['username']:
                 return redirect(url_for('error_route', message="Email 已被其他會員使用"))
 
+        # 電話驗證
+        if new_phone and not (new_phone.isdigit() and len(new_phone) == 10 and new_phone.startswith("09")):
+            return redirect(url_for('error_route', message="電話需為 10 碼數字且開頭為 09"))
+
+        # 密碼驗證
+        if new_password and not (6 <= len(new_password) <= 16):
+            return redirect(url_for('error_route', message="密碼長度需介於 6 至 16 字元"))
+
         # 更新資料
         user['email'] = new_email
         user['phone'] = new_phone
         user['birthdate'] = new_birthdate
-        if new_password: # 有填才改密碼
+        if new_password:
             user['password'] = new_password
         
         save_users(USER_DATA_FILE, data)
@@ -244,13 +250,27 @@ def edit_user_route(username):
     data = read_users(USER_DATA_FILE)
     user = next((u for u in data["users"] if u["username"] == username), None)
 
+    if user is None:
+        return redirect(url_for('error_route', message="找不到該會員"))
+
     if request.method == 'POST':
-        user['phone'] = request.form.get("phone", "").strip()
-        user['birthdate'] = request.form.get("birthdate", "").strip()
+        new_phone = request.form.get("phone", "").strip()
+        new_birthdate = request.form.get("birthdate", "").strip()
         new_pw = request.form.get("password", "").strip()
+
+        # 電話驗證
+        if new_phone and not (new_phone.isdigit() and len(new_phone) == 10 and new_phone.startswith("09")):
+            return redirect(url_for('error_route', message="電話需為 10 碼數字且開頭為 09"))
+
+        # 密碼驗證
+        if new_pw and not (6 <= len(new_pw) <= 16):
+            return redirect(url_for('error_route', message="密碼長度需介於 6 至 16 字元"))
+
+        user['phone'] = new_phone
+        user['birthdate'] = new_birthdate
         if new_pw:
             user['password'] = new_pw
-        
+
         save_users(USER_DATA_FILE, data)
         return redirect(url_for('users_list_route'))
 
